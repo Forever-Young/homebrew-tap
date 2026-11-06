@@ -1,0 +1,22 @@
+M-Commander 6.1.0: avoid treating zsh RPROMPT as command input.
+
+The embedded terminal reads input from the end of PROMPT to the right edge
+of the screen. RPROMPT is included in that range even on an empty line, so
+Enter runs an empty shell command instead of opening the selected directory.
+Clear the right prompt in the embedded shell's precmd hook, after the user's
+hooks. This is a compatibility workaround, not full right-prompt support.
+No user startup files or outer-terminal settings are changed.
+
+--- a/src/mcterm/mcterm_setup.c
++++ b/src/mcterm/mcterm_setup.c
+@@ -92,6 +92,10 @@
+         "}\n"
+         "__mc_precmd(){\n"
+         " local e=$?\n"
++        /* The host reads the command line from the screen after PROMPT. A right
++           prompt occupies that same range and would be mistaken for typed text.
++           Clear it after the user's precmd hooks, only in this embedded shell. */
++        " RPROMPT= RPS1=\n"
+         " printf '\\033]133;D;%s;" MCTERM_MARK_TOKEN_KEY "%s\\007' \"$e\" \"$__mc_tok\"\n"
+         " printf '\\033]7;file://%s" MCTERM_OSC7_TOKEN_PREFIX "%s\\007'"
+         " \"$(__mc_pe \"$PWD\")\" \"$__mc_tok\"\n"

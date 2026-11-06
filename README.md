@@ -21,8 +21,15 @@ mcommander
 ```
 
 Builds [M-Commander](https://github.com/blue-panels/mcommander) 6.1.0 directly
-from its upstream release source archive, verified by SHA-256. No source
-patches are needed. Supports macOS; the local build was verified on Apple Silicon.
+from its upstream release source archive, verified by SHA-256. Supports macOS;
+the local build was verified on Apple Silicon.
+
+A [tap-local patch](patches/mcommander/6.1.0-zsh-rprompt.patch) clears zsh's
+right-hand prompt only inside the embedded shell. Version 6.1.0 otherwise
+mistakes that prompt for command input, so Enter runs an empty command instead
+of opening the selected directory. The left prompt and normal terminal
+configuration are unchanged. This is a workaround pending upstream support for
+right-hand prompts.
 
 Includes the S-Lang interface, built-in editor and viewer, Lua runtime, and
 archive, SFTP, FTP/FTPS and S3 plugins. Samba and MongoDB plugins are disabled
@@ -39,7 +46,12 @@ For future releases, update the source URL and SHA-256 in
 brew reinstall --build-from-source forever-young/tap/mcommander
 brew test forever-young/tap/mcommander
 brew audit --strict forever-young/tap/mcommander
+python3 "$(brew --repository forever-young/tap)/tests/mcommander-navigation.py"
 ```
+
+The PTY regression check verifies navigation with and without zsh RPROMPT and
+that typed commands still execute. Add `--real-config` to also test navigation
+with your own zsh startup files.
 
 Release 6.1.0 uses Autotools and includes a generated `configure` script.
 The development branch has moved to Meson, so the build commands must also

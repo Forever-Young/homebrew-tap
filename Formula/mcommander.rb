@@ -4,6 +4,7 @@ class Mcommander < Formula
   url "https://github.com/blue-panels/mcommander/releases/download/v6.1.0/mcommander-6.1.0.tar.gz"
   sha256 "32fa33be816f9bb40705068ae7b468c2ad640dead8da378a878656562d59fd88"
   license "GPL-3.0-or-later"
+  revision 1
 
   depends_on "pkgconf" => :build
   depends_on "curl"
@@ -15,6 +16,12 @@ class Mcommander < Formula
   depends_on "lua"
   depends_on :macos
   depends_on "s-lang"
+
+  # Work around RPROMPT being read as command text by the embedded terminal.
+  patch do
+    url "https://raw.githubusercontent.com/Forever-Young/homebrew-tap/3469ec3f52685754416e751804fa2afd16735327/patches/mcommander/6.1.0-zsh-rprompt.patch"
+    sha256 "77b74cd2d047ad368aacbc3610d4c24f5c4e1d6132c8bedeadf68b75fbcf4b01"
+  end
 
   def install
     # Keep Homebrew build shims out of the installed syntax definitions.

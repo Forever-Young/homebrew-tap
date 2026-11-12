@@ -26,6 +26,7 @@ def run(right, command=False, real=False):
      except OSError:return
   try:
    drain(8)
+   right_prompt_visible = not right or right.encode() in output
    if command:
     os.write(fd,('touch '+str(marker)).encode());drain(1);os.write(fd,b'\r');drain(3)
     # Return from the command's terminal view to panels.
@@ -36,7 +37,7 @@ def run(right, command=False, real=False):
    done,status=os.waitpid(pid,os.WNOHANG)
    if not done:os.kill(pid,signal.SIGTERM);os.waitpid(pid,0)
    actual=result.read_text().strip() if result.exists() else '(no cwd output)'
-   ok=(marker.exists() if command else actual==str(child)) and done and status==0
+   ok=(marker.exists() if command else actual==str(child)) and done and status==0 and right_prompt_visible
    print(('real config' if real else 'RPROMPT='+repr(right)), 'command' if command else 'navigate', 'PASS' if ok else 'FAIL', 'cwd='+actual, 'marker='+str(marker.exists()))
    return ok
   finally:

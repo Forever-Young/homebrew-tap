@@ -1,11 +1,13 @@
 class Mcommander < Formula
   desc "Two-panel terminal file manager based on Midnight Commander"
   homepage "https://github.com/blue-panels/mcommander"
-  url "https://github.com/blue-panels/mcommander/releases/download/v6.1.0/mcommander-6.1.0.tar.gz"
-  sha256 "32fa33be816f9bb40705068ae7b468c2ad640dead8da378a878656562d59fd88"
+  url "https://github.com/blue-panels/mcommander/archive/2717649857e3720de2027b40667e4b57eff251eb.tar.gz"
+  version "6.1.0.20261111"
+  sha256 "5ca74e5e059440a0b2832b2738e726fb784db2328da0c5ce12306ff2c68ad811"
   license "GPL-3.0-or-later"
-  revision 1
 
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkgconf" => :build
   depends_on "curl"
   depends_on "gettext"
@@ -17,31 +19,48 @@ class Mcommander < Formula
   depends_on :macos
   depends_on "s-lang"
 
-  # Work around RPROMPT being read as command text by the embedded terminal.
-  patch do
-    url "https://raw.githubusercontent.com/Forever-Young/homebrew-tap/3469ec3f52685754416e751804fa2afd16735327/patches/mcommander/6.1.0-zsh-rprompt.patch"
-    sha256 "77b74cd2d047ad368aacbc3610d4c24f5c4e1d6132c8bedeadf68b75fbcf4b01"
-  end
+  conflicts_with "midnight-commander", because: "both install the mc command"
 
   def install
-    # Keep Homebrew build shims out of the installed syntax definitions.
-    ENV["RUBY"] = "/usr/bin/ruby"
+    # GitHub commit archives have no .git directory for upstream's version.sh.
+    (buildpath/".tarball-version").write "#{version}\n"
 
-    system "./configure", *std_configure_args,
-           "--disable-static", "--disable-tests", "--disable-ext2fs-attr",
-           "--without-x", "--without-gpm-mouse", "--with-screen=slang",
-           "--enable-lua-plugin=yes", "--enable-panel-plugin-sftp=yes",
-           "--enable-panel-plugin-ftp=yes", "--enable-panel-plugin-arcmc=yes",
-           "--enable-panel-plugin-s3=yes", "--enable-panel-plugin-samba=no",
-           "--enable-panel-plugin-mongo=no"
-    system "make"
-    system "make", "install"
+    # Avoid embedding Homebrew's temporary Ruby shim in syntax definitions.
+    (buildpath/"homebrew-native.ini").write "[binaries]\nruby = '/usr/bin/ruby'\n"
+
+    system "meson", "setup", "build", *std_meson_args,
+           "--native-file=#{buildpath}/homebrew-native.ini",
+           "-Dscreen=slang", "-Dgpm=disabled", "-Dx11=disabled",
+           "-Dext2fs_attr=disabled", "-Dtests=disabled", "-Dsession=disabled",
+           "-Dlua=enabled", "-Dpanel_plugin_sftp=enabled",
+           "-Dpanel_plugin_ftp=enabled", "-Dpanel_plugin_arcmc=enabled",
+           "-Dpanel_plugin_s3=enabled", "-Dpanel_plugin_samba=disabled",
+           "-Dpanel_plugin_mongo=disabled", "-Dpanel_plugin_acl=disabled",
+           "-Dpanel_plugin_postgres=disabled"
+    system "meson", "compile", "-C", "build"
+    system "meson", "install", "-C", "build"
+    bin.install_symlink "mcommander" => "mc"
+  end
+
+  def caveats
+    <<~EOS
+      Run mc to launch M-Commander.
+
+      To switch from stock Midnight Commander without uninstalling it:
+        brew unlink midnight-commander
+        brew link forever-young/tap/mcommander
+
+      To switch back:
+        brew unlink forever-young/tap/mcommander
+        brew link midnight-commander
+    EOS
   end
 
   test do
     ENV["TERM"] = "xterm"
     assert_match version.to_s, shell_output("#{bin}/mcommander --version")
-    %w[mc6 mcedit6 mview mdiff mctree mcstruct].each do |command|
+    assert_match version.to_s, shell_output("#{bin}/mc --version")
+    %w[mc6 mcedit6 mview mcdiff6 mctree mcstruct].each do |command|
       assert_path_exists bin/command
     end
     assert_match "mcommander", shell_output("#{bin}/mcommander --datadir")

@@ -3,7 +3,7 @@ class CloudshareCli < Formula
   homepage "https://github.com/Forever-Young/homebrew-tap"
   url "https://github.com/Forever-Young/homebrew-tap/releases/download/cloudshare-cli-1.1/cloudshare-cli-1.1.zip"
   version "1.1"
-  sha256 "2e65041775a64c3b5be62c19a57aae9d69d87e5f012f0af92455fbdbb3f50742"
+  sha256 "100b8c1ce4d0237e553c9d901a793ff2a34ba9afca5ee39073a6724056845880"
 
   depends_on macos: :sequoia
 

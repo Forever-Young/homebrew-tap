@@ -13,6 +13,19 @@ tap "forever-young/tap"
 brew "<formula>"
 ```
 
+## CloudShare CLI
+
+```sh
+brew install forever-young/tap/cloudshare-cli
+cloudshare upload report.pdf
+```
+
+Command line companion of the [CloudShare](https://apps.apple.com/app/id6823902669) Mac app.
+The app does the upload with the bucket and credentials you set up in it; the tool hands it
+files over a local socket and prints the links. Requires macOS 15 and CloudShare 1.1 or later.
+The release zip is a notarized, Developer ID signed app bundle built from the CloudShare
+repository.
+
 ## M-Commander
 
 ```sh

@@ -1,0 +1,70 @@
+diff --git a/lib/tty/key.c b/lib/tty/key.c
+index 1af4f85d6..dfe060e75 100644
+--- a/lib/tty/key.c
++++ b/lib/tty/key.c
+@@ -1528,6 +1528,20 @@ kitty_tilde_key (unsigned int number)
+ }
+ 
+ /* --------------------------------------------------------------------------------------------- */
++/* What Shift types with a key of the US layout, for a terminal that does not report it */
++
++static unsigned int
++kitty_us_shifted (unsigned int key)
++{
++    static const char plain[] = "`1234567890-=[]\\;',./";
++    static const char shifted[] = "~!@#$%^&*()_+{}|:\"<>?";
++    const char *p = key != 0 ? strchr (plain, (int) key) : NULL;
++
++    return p != NULL ? (unsigned int) shifted[p - plain] : key;
++}
++
++/* --------------------------------------------------------------------------------------------- */
++
+ /* Turn a kitty key event into the code a legacy terminal would give for the same key. */
+ 
+ static int
+@@ -1616,8 +1630,11 @@ kitty_key_code (int final, unsigned int key, unsigned int shifted, unsigned int
+         {
+             if (shifted > 31 && shifted < 127)
+                 key = shifted;
+-            else
++            else if (g_ascii_isalpha ((gchar) key))
+                 key = (unsigned int) g_ascii_toupper ((gchar) key);
++            else
++                // no alternate key reported (a multiplexer may drop it): the US layout
++                key = kitty_us_shifted (key);
+         }
+         mod &= ~KEY_M_SHIFT;
+     }
+@@ -3337,6 +3354,31 @@ nodelay_try_again:
+                 }
+                 return c;
+             }
++
++            // An Esc key event followed by a plain character is Esc-<char>, as on a legacy
++            // terminal: the Meta way of typing Alt. The Esc key event is a sequence of its own,
++            // so the legacy code above does not see the character after it.
++            if (c == ESC_CHAR && old_esc_mode)
++            {
++                const int next = getch_with_timeout (old_esc_mode_timeout);
++
++                if (next >= 0x20 && next < 0x7F)
++                {
++                    kitty_event_valid = FALSE;
++                    if (g_ascii_isdigit (next))
++                        c = KEY_F (next - '0');
++                    else if (next == ' ')
++                        c = ESC_CHAR;
++                    else
++                        c = ALT (next);
++                }
++                else if (next >= 0)
++                {
++                    const unsigned char b = (unsigned char) next;
++
++                    tty_unget_input (&b, 1);
++                }
++            }
+             goto done;
+         }
+ 

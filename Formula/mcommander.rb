@@ -3,6 +3,7 @@ class Mcommander < Formula
   homepage "https://github.com/blue-panels/mcommander"
   url "https://github.com/blue-panels/mcommander/archive/2717649857e3720de2027b40667e4b57eff251eb.tar.gz"
   version "6.1.0.20261111"
+  revision 1
   sha256 "5ca74e5e059440a0b2832b2738e726fb784db2328da0c5ce12306ff2c68ad811"
   license "GPL-3.0-or-later"
 
@@ -20,6 +21,12 @@ class Mcommander < Formula
   depends_on "s-lang"
 
   conflicts_with "midnight-commander", because: "both install the mc command"
+
+  # Esc then a key is Alt-key with the kitty protocol too; Alt-? without the shifted key.
+  patch do
+    url "file://#{__dir__}/../patches/mcommander/6.1.0-kitty-esc-prefix.patch"
+    sha256 "5dcba817cb6f69715ceaa497dcb2665ee694ece44af13b7fd7db0808cb61691b"
+  end
 
   def install
     # GitHub commit archives have no .git directory for upstream's version.sh.

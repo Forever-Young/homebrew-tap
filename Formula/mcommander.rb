@@ -3,9 +3,9 @@ class Mcommander < Formula
   homepage "https://github.com/blue-panels/mcommander"
   url "https://github.com/blue-panels/mcommander/archive/2717649857e3720de2027b40667e4b57eff251eb.tar.gz"
   version "6.1.0.20261111"
-  revision 1
   sha256 "5ca74e5e059440a0b2832b2738e726fb784db2328da0c5ce12306ff2c68ad811"
   license "GPL-3.0-or-later"
+  revision 1
 
   depends_on "meson" => :build
   depends_on "ninja" => :build

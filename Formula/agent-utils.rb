@@ -1,14 +1,14 @@
-# Formula for the Forever-Young/tap tap. Build from a pinned commit of the repository;
-# update `revision` (and `version`) for a new release. Textual and its dependencies are pinned
-# like pyproject.toml.
+# Formula for the Forever-Young/tap tap. It installs the tarball of a GitHub release
+# (scripts/release.py writes url, version and sha256 here and in the tap). Textual and its
+# dependencies are pinned like pyproject.toml.
 class AgentUtils < Formula
   include Language::Python::Virtualenv
 
   desc "Utilities for coding agents: agterm project launch, skills, instructions"
   homepage "https://github.com/Forever-Young/agent-utils"
-  url "https://github.com/Forever-Young/agent-utils.git",
-      revision: "01ddd0012a7610196c6017aecb458128d43ed252"
+  url "https://github.com/Forever-Young/agent-utils/releases/download/v0.1.0/agent-utils-0.1.0.tar.gz"
   version "0.1.0"
+  sha256 "1485c79e5498d519ebb4fa616175ed347f90990d97d8a27e95be95afcda3285c"
   license "MIT"
 
   depends_on "python@3.13"
@@ -73,10 +73,11 @@ class AgentUtils < Formula
   def caveats
     <<~EOS
       Installing changes no configuration, shell startup, Kiro hooks or provider files.
-      Opt-in setup (each previews first, add --apply to write):
-        #{opt_libexec}/bin/python #{opt_pkgshare}/scripts/configure-optional.py   # lists them
-        #{opt_libexec}/bin/python #{opt_pkgshare}/scripts/configure-zsh.py
-        #{opt_libexec}/bin/python #{opt_pkgshare}/scripts/configure-kiro.py
+      Opt-in setup (each previews first, add --yes to write):
+        agents admin config run optional-list                 # lists them
+        agents admin config run optional zsh-startup
+        agents admin config run optional kiro-hooks
+      or open the settings app with `agents configure`.
 
       Config, state and history live outside the formula (see the README) and survive
       `brew uninstall`. Use one install channel per machine: if scripts/install.py

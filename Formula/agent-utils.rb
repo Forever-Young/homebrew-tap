@@ -7,7 +7,7 @@ class AgentUtils < Formula
   desc "Utilities for coding agents: agterm project launch, skills, instructions"
   homepage "https://github.com/Forever-Young/agent-utils"
   url "https://github.com/Forever-Young/agent-utils.git",
-      revision: "c9790b907d7389a227f900e546381b312fc93a95"
+      revision: "01ddd0012a7610196c6017aecb458128d43ed252"
   version "0.1.0"
   license "MIT"
 

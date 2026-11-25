@@ -2,7 +2,6 @@ class CloudshareCli < Formula
   desc "Upload files to your S3-compatible bucket through the CloudShare Mac app"
   homepage "https://github.com/Forever-Young/homebrew-tap"
   url "https://github.com/Forever-Young/homebrew-tap/releases/download/cloudshare-cli-1.1/cloudshare-cli-1.1.zip"
-  version "1.1"
   sha256 "73d859ab226cf386f45b2e144dfa2a7a11a8aa49e069cd86181ecf610520f956"
 
   depends_on macos: :sequoia

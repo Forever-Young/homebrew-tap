@@ -6,8 +6,8 @@ class AgentUtils < Formula
 
   desc "Utilities for coding agents: agterm project launch, skills, instructions"
   homepage "https://github.com/Forever-Young/agent-utils"
-  url "https://github.com/Forever-Young/agent-utils/releases/download/v0.1.4/agent-utils-0.1.4.tar.gz"
-  sha256 "16a03a9c6f4b425900fabaa4adfd65a5ecc7fd3042d9589a1a4a417c3479453c"
+  url "https://github.com/Forever-Young/agent-utils/releases/download/v0.1.5/agent-utils-0.1.5.tar.gz"
+  sha256 "06e6ad20e3dbea5f96f6c3f59ad1d4665f4fe55232b996cedfea8c01a5bdd06e"
   license "MIT"
 
   depends_on "python@3.13"
